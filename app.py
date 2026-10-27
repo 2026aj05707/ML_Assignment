@@ -153,7 +153,7 @@ if uploaded_file is not None:
                         rows.append({"ML Model Name": name, **m})
                 comparison_df = pd.DataFrame(rows).set_index("ML Model Name")
                 st.dataframe(
-                    comparison_df.style.format("{:.4f}").highlight_max(axis=0, color="#c6efce"),
+                    comparison_df.style.format("{:.4f}").highlight_max(axis=0, props="background-color:#c6efce;color:black"),
                     use_container_width=True
                 )
                 best_model = comparison_df["MCC"].idxmax()
