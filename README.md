@@ -62,12 +62,12 @@ Cardiovascular diseases are the leading cause of death worldwide, and early iden
 
 | ML Model Name | Observation about model performance |
 | :--- | :--- |
-| **Logistic Regression** | TODO |
-| **Decision Tree** | TODO |
-| **KNN** | TODO |
-| **Naive Bayes** | TODO |
-| **Support Vector Machine** | TODO |
-| **Overall, Winner for your dataset?** | TODO |
+| **Logistic Regression** | Gives a solid, balanced baseline across all metrics because the standardized clinical features separate fairly well linearly. |
+| **Decision Tree** | Simple to interpret, but it has the lowest precision and struggles to catch as many positive cases as the other models. |
+| **KNN** | Delivers the highest overall accuracy and MCC by grouping patients with similar heart rate and blood pressure profiles together. |
+| **Naive Bayes** | Struggles heavily on recall and overall accuracy because its assumption that all symptoms are independent does not hold for related heart indicators. |
+| **Support Vector Machine** | Achieves the highest AUC and matches KNN on recall, using its curved boundary to separate complex patient cases smoothly. |
+| **Overall, Winner for your dataset?** | **KNN (K-Nearest Neighbors)** is the overall winner because it scores highest in Accuracy (0.8424), Precision (0.8614), F1 (0.8571), and MCC (0.6814) while matching the top Recall (0.8529). |
 
 ## Project Structure
 
