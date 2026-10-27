@@ -36,7 +36,7 @@ Cardiovascular diseases are the leading cause of death worldwide, and early iden
 
 ## c. Github Repository Link
 - **GitHub Repository:** https://github.com/2026aj05707/ML_Assignment
-- **Live Streamlit App:** https://<your-app-subdomain>.streamlit.app
+- **Live Streamlit App:** https://mlassignment-gnqwmgawx9d7ibsvh7b9u3.streamlit.app
 
 ## d. Models used:
 
