@@ -35,6 +35,15 @@ uploaded_file = st.sidebar.file_uploader(
     type=["csv"]
 )
 
+if os.path.exists("test_data.csv"):
+    with open("test_data.csv", "rb") as f:
+        st.sidebar.download_button(
+            "Download sample test_data.csv",
+            data=f,
+            file_name="test_data.csv",
+            mime="text/csv"
+        )
+
 st.sidebar.header("2. Model Selection")
 model_options = {
     "Logistic Regression": "model/logistic_regression.joblib",
@@ -46,16 +55,38 @@ model_options = {
 
 selected_model_name = st.sidebar.selectbox("Choose Classifier", list(model_options.keys()))
 
+EXPECTED_FEATURES = [
+    "age", "sex", "cp", "trestbps", "chol", "fbs", "restecg",
+    "thalach", "exang", "oldpeak", "slope", "ca", "thal"
+]
+
+
+def compute_metrics(model, X, y):
+    y_pred = model.predict(X)
+    if hasattr(model, "predict_proba"):
+        scores = model.predict_proba(X)[:, 1]
+    else:
+        scores = model.decision_function(X)
+    return y_pred, {
+        "Accuracy": accuracy_score(y, y_pred),
+        "AUC": roc_auc_score(y, scores),
+        "Precision": precision_score(y, y_pred, zero_division=0),
+        "Recall": recall_score(y, y_pred, zero_division=0),
+        "F1": f1_score(y, y_pred, zero_division=0),
+        "MCC": matthews_corrcoef(y, y_pred),
+    }
+
 if uploaded_file is not None:
     try:
         data = pd.read_csv(uploaded_file)
         st.subheader("Uploaded Dataset Preview")
         st.dataframe(data.head(5), use_container_width=True)
 
-        if "target" not in data.columns:
-            st.error("Error: The uploaded CSV must contain a 'target' column.")
+        missing = [c for c in EXPECTED_FEATURES + ["target"] if c not in data.columns]
+        if missing:
+            st.error(f"Error: The uploaded CSV is missing required columns: {', '.join(missing)}")
         else:
-            X_test = data.drop(columns=["target"])
+            X_test = data[EXPECTED_FEATURES]
             y_test = data["target"]
 
             model_path = model_options[selected_model_name]
@@ -64,33 +95,18 @@ if uploaded_file is not None:
             else:
                 model = joblib.load(model_path)
 
-                # Predictions
-                y_pred = model.predict(X_test)
-
-                # Predict Proba for AUC
-                if hasattr(model, "predict_proba"):
-                    y_proba = model.predict_proba(X_test)[:, 1]
-                    auc = roc_auc_score(y_test, y_proba)
-                else:
-                    auc = 0.0
-
-                # Metrics calculation
-                acc = accuracy_score(y_test, y_pred)
-                prec = precision_score(y_test, y_pred, zero_division=0)
-                rec = recall_score(y_test, y_pred, zero_division=0)
-                f1 = f1_score(y_test, y_pred, zero_division=0)
-                mcc = matthews_corrcoef(y_test, y_pred)
+                y_pred, metrics = compute_metrics(model, X_test, y_test)
 
                 st.subheader(f"Evaluation Metrics: {selected_model_name}")
                 col1, col2, col3 = st.columns(3)
                 col4, col5, col6 = st.columns(3)
 
-                col1.metric("Accuracy", f"{acc:.4f}")
-                col2.metric("AUC Score", f"{auc:.4f}")
-                col3.metric("Precision", f"{prec:.4f}")
-                col4.metric("Recall", f"{rec:.4f}")
-                col5.metric("F1 Score", f"{f1:.4f}")
-                col6.metric("MCC Score", f"{mcc:.4f}")
+                col1.metric("Accuracy", f"{metrics['Accuracy']:.4f}")
+                col2.metric("AUC Score", f"{metrics['AUC']:.4f}")
+                col3.metric("Precision", f"{metrics['Precision']:.4f}")
+                col4.metric("Recall", f"{metrics['Recall']:.4f}")
+                col5.metric("F1 Score", f"{metrics['F1']:.4f}")
+                col6.metric("MCC Score", f"{metrics['MCC']:.4f}")
 
                 st.markdown("---")
 
@@ -125,6 +141,23 @@ if uploaded_file is not None:
                     )
                     report_df = pd.DataFrame(report_dict).transpose()
                     st.dataframe(report_df.style.format("{:.3f}"), use_container_width=True)
+
+                st.markdown("---")
+
+                # Side-by-side comparison of every saved model on the same test data
+                st.subheader("Comparison of All Models on Uploaded Data")
+                rows = []
+                for name, path in model_options.items():
+                    if os.path.exists(path):
+                        _, m = compute_metrics(joblib.load(path), X_test, y_test)
+                        rows.append({"ML Model Name": name, **m})
+                comparison_df = pd.DataFrame(rows).set_index("ML Model Name")
+                st.dataframe(
+                    comparison_df.style.format("{:.4f}").highlight_max(axis=0, color="#c6efce"),
+                    use_container_width=True
+                )
+                best_model = comparison_df["MCC"].idxmax()
+                st.caption(f"Best model by MCC on this data: **{best_model}**")
 
     except Exception as e:
         st.error(f"Error evaluating test dataset: {str(e)}")
