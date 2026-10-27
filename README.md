@@ -47,5 +47,30 @@ Cardiovascular diseases (CVDs) remain the leading cause of mortality globally, a
 | **Decision Tree** | With pruning applied (depth limit 5), the model achieved 78.69% accuracy and 0.8176 AUC. While highly interpretable and capable of matching the 90.91% recall benchmark, the orthogonal splits produced more false positives, resulting in lower precision (75.00%) and MCC (0.5789). |
 | **KNN** | Standardized Euclidean distance with $k=7$ attained 81.97% accuracy, 0.8837 AUC, and an MCC of 0.6410. Because physiological features like heart rate and ST depression naturally cluster among healthy vs. diseased patients, local neighborhood voting yields strong discriminating power. |
 | **Naive Bayes** | Gaussian Naive Bayes matched KNN with 81.97% accuracy, 0.8755 AUC, and 0.6410 MCC. Despite the theoretical assumption of conditional feature independence being mildly violated by correlated physiological indicators (e.g., blood pressure and cholesterol), the probabilistic classifier maintained high diagnostic sensitivity (90.91% recall). |
-| **Support Vector Machine** | Achieved the highest performance across all six evaluated metrics: 83.61% accuracy, 0.8831 AUC, 79.49% precision, 93.94% recall, 0.8611 F1 score, and 0.6784 MCC. The radial basis function (RBF) kernel effectively mapped complex non-linear clinical interactions into a higher-dimensional space where classes are more cleanly separable. |
-| **Overall, Winner for your dataset?** | **Support Vector Machine (SVM with RBF Kernel)** is the undisputed overall winner. In clinical medical diagnostics, recall (sensitivity) is paramount to prevent missed diagnoses. SVM achieved both the highest Recall (0.9394) and highest Precision (0.7949), along with superior global correlation (MCC: 0.6784) and Overall Accuracy (0.8361). |
+| **Support Vector Machine** | Achieved the best score on five of the six metrics: 83.61% accuracy, 79.49% precision, 93.94% recall, 0.8611 F1 score, and 0.6784 MCC. Its AUC (0.8831) was a close second to KNN (0.8837). The radial basis function (RBF) kernel effectively mapped complex non-linear clinical interactions into a higher-dimensional space where classes are more cleanly separable. |
+| **Overall, Winner for your dataset?** | **Support Vector Machine (SVM with RBF Kernel)** is the overall winner. In clinical medical diagnostics, recall (sensitivity) is paramount to prevent missed diagnoses. SVM achieved both the highest Recall (0.9394) and highest Precision (0.7949), along with superior global correlation (MCC: 0.6784) and Overall Accuracy (0.8361). |
+
+## Project Structure
+
+```
+ML_Assignment/
+├── app.py                  # Streamlit dashboard (upload, model selection, metrics, confusion matrix)
+├── ML_Assignment2.ipynb    # Data preprocessing, model training and evaluation
+├── requirements.txt        # Python dependencies
+├── test_data.csv           # Held-out test split (61 rows, 13 features + target)
+└── model/                  # Saved scikit-learn pipelines (preprocessing + classifier)
+    ├── logistic_regression.joblib
+    ├── decision_tree.joblib
+    ├── knn.joblib
+    ├── naive_bayes.joblib
+    └── support_vector_machine.joblib
+```
+
+## Running Locally
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Upload `test_data.csv` from the sidebar (or download it via the sidebar button), pick a classifier, and the app evaluates the saved model on the uploaded data without retraining.
