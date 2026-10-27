@@ -24,7 +24,7 @@ Cardiovascular diseases (CVDs) remain the leading cause of mortality globally, a
   13. `thal`: Thalassemia category (1: normal, 2: fixed defect, 3: reversible defect)
 
 ## c. Github Repository Link
-- **GitHub Repository:** https://github.com/<your-username>/<your-repo-name>
+- **GitHub Repository:** https://github.com/2026aj05707/ML_Assignment
 - **Live Streamlit App:** https://<your-app-subdomain>.streamlit.app
 
 ## d. Models used:
